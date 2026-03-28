@@ -22,16 +22,25 @@ interface LevelData {
 
 const W = 800, H = 400;
 
-// NES-палитра
+// Точные цвета с картинки (пипеткой)
 const C = {
-  skyBlue:  "#5c94fc", skyBlue2: "#9ab8fc",
-  brickDk:  "#8b2800", brickMd: "#c84010", brickLt: "#e05828",
-  groundDk: "#8b4020", groundMd: "#c85830", groundLt: "#e07040", groundGrass: "#5cb840", groundGrassLt: "#78d050",
-  qblockYel:"#e8b000", qblockLt: "#f8d000", qblockDk: "#b07800", qblockEye: "#000",
+  // небо
+  skyBlue:  "#6b8cff", skyBlue2: "#8faeff",
+  // кирпич — тёмно-красный как на картинке
+  brickDk:  "#6b1800", brickMd:  "#b83010", brickLt:  "#d04820", brickMortar: "#000000",
+  // земля — такой же красно-кирпичный, более насыщенный
+  groundDk: "#6b1800", groundMd: "#b83010", groundLt: "#d04820",
+  groundGrass: "#5cb840", groundGrassLt: "#80d050",
+  // ?-блок — ярко жёлтый как на картинке
+  qblockBg:  "#f8b800", qblockLt:  "#fce870", qblockDk:  "#986000", qblockBorder: "#000",
+  // камень
   stoneDk:  "#505050", stoneMd: "#787878", stoneLt: "#a8a8a8",
+  // снег
   snowDk:   "#6898b8", snowMd:  "#8ab4cc", snowWht: "#e8f4ff", snowTop: "#ffffff",
+  // лава
   lavaDk:   "#6a1000", lavaMd:  "#a02000", lavaLt:  "#cc3000", lavaGlow: "#ff5500",
-  pipeDk:   "#007000", pipeMd:  "#00a800", pipeLt:  "#00d000", pipeSh:  "#005000",
+  // труба — тёмно-зелёная как на картинке
+  pipeDk:   "#143800", pipeMd:  "#286300", pipeLt:  "#3c8c00", pipeSh:  "#0a2000",
 };
 
 // ── УРОВНИ ───────────────────────────────────────────────────────────────────
@@ -39,7 +48,7 @@ function makeLevel1(): LevelData {
   // Финиш на x=720, земля y=368. Флагшток стоит на двух каменных блоках 720..752 y=336..368
   return {
     name: "1-1: Грибное королевство",
-    bg: C.skyBlue, bgColor2: C.skyBlue2,
+    bg: "#6b8cff", bgColor2: "#6b8cff",
     startX: 48, startY: 300,
     finishX: 728, finishY: 240, finishGroundY: 368,
     requiredCoins: 8, requiredKills: 2,
@@ -176,177 +185,209 @@ function makeLevel3(): LevelData {
 const LEVELS = [makeLevel1, makeLevel2, makeLevel3];
 
 // ══════════════════════════════════════════════════════════════════════════════
-//  ПИКСЕЛЬНЫЕ ТЕКСТУРЫ
+//  ПИКСЕЛЬНЫЕ ТЕКСТУРЫ (цвета точно с картинки)
 // ══════════════════════════════════════════════════════════════════════════════
 
-const T = 16; // tile size
+const T = 16;
 
-function drawGroundTile(ctx: CanvasRenderingContext2D, x: number, y: number) {
-  // NES-стиль земляного блока: оранжево-коричневый кирпич с тёмными линиями
-  ctx.fillStyle = C.groundMd; ctx.fillRect(x, y, T, T);
-  // тёмные разделители
-  ctx.fillStyle = C.groundDk;
-  ctx.fillRect(x, y, T, 1);
-  ctx.fillRect(x, y, 1, T);
-  // светлые пиксели левый верх
-  ctx.fillStyle = C.groundLt;
-  ctx.fillRect(x + 1, y + 1, 6, 1);
-  ctx.fillRect(x + 1, y + 1, 1, 6);
-}
-
+// Земля — красно-кирпичный паттерн как на картинке (нижняя полоса)
 function drawGround(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  // верхняя полоска травы
-  ctx.fillStyle = C.groundGrass;
-  ctx.fillRect(x, y, w, 8);
-  ctx.fillStyle = C.groundGrassLt;
-  ctx.fillRect(x, y, w, 3);
-  // тело
-  for (let ty = y + 8; ty < y + h; ty += T) {
-    for (let tx = x; tx < x + w; tx += T) {
-      drawGroundTile(ctx, tx, ty);
+  // верхушка — тёмно-красная строка
+  ctx.fillStyle = C.groundDk;
+  ctx.fillRect(x, y, w, 2);
+  // тело из кирпичных тайлов
+  for (let row = 0; row * T < h - 2; row++) {
+    const ty = y + 2 + row * T;
+    const shift = (row % 2) * (T / 2);
+    ctx.fillStyle = C.groundMd;
+    ctx.fillRect(x, ty, w, T);
+    // горизонтальные швы
+    ctx.fillStyle = C.groundDk;
+    ctx.fillRect(x, ty, w, 1);
+    // вертикальные швы со сдвигом
+    for (let col = -1; col * T < w + T; col++) {
+      const tx = x + col * T - shift + T - 1;
+      if (tx >= x && tx < x + w) {
+        ctx.fillStyle = C.groundDk;
+        ctx.fillRect(tx, ty, 2, T);
+      }
+    }
+    // светлые блики — верх-лево каждого кирпича
+    ctx.fillStyle = C.groundLt;
+    for (let col = -1; col * T < w + T; col++) {
+      const bx = x + col * T - shift;
+      if (bx + 2 >= x && bx < x + w) {
+        ctx.fillRect(Math.max(x, bx + 2), ty + 1, 4, 1);
+      }
     }
   }
-  // тёмная линия под травой
-  ctx.fillStyle = C.groundDk;
-  ctx.fillRect(x, y + 8, w, 2);
 }
 
+// Кирпичный блок — точно как на картинке: тёмно-красный с чёрными швами
 function drawBrick(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = C.brickMd;
   ctx.fillRect(x, y, w, h);
-  for (let ty = 0; ty < h; ty += 8) {
-    const offset = (Math.floor(ty / 8) % 2 === 0) ? 0 : T;
-    for (let tx = -offset; tx < w + T; tx += T * 2) {
-      // тёмный разделитель по вертикали
-      ctx.fillStyle = C.brickDk;
-      ctx.fillRect(x + tx + T - 1, y + ty, 2, 8);
+  for (let row = 0; row * 8 < h; row++) {
+    const ty = y + row * 8;
+    const shift = (row % 2) * T;
+    // горизонтальный шов
+    ctx.fillStyle = C.brickMortar;
+    ctx.fillRect(x, ty, w, 1);
+    // вертикальные швы
+    for (let col = -1; col * T < w + T; col++) {
+      const tx = x + col * T + T - shift;
+      if (tx > x && tx < x + w) {
+        ctx.fillRect(tx, ty, 1, 8);
+      }
     }
-    // горизонтальная линия
-    ctx.fillStyle = C.brickDk;
-    ctx.fillRect(x, y + ty + 7, w, 1);
-    // светлый блик
+    // светлый блик строки
     ctx.fillStyle = C.brickLt;
-    ctx.fillRect(x, y + ty, w, 1);
+    ctx.fillRect(x, ty + 1, w, 1);
   }
-  // общий блик сверху
-  ctx.fillStyle = C.brickLt;
+  // внешняя обводка
+  ctx.fillStyle = C.brickMortar;
   ctx.fillRect(x, y, w, 1);
+  ctx.fillRect(x, y + h - 1, w, 1);
   ctx.fillRect(x, y, 1, h);
+  ctx.fillRect(x + w - 1, y, 1, h);
 }
 
+// ?-блок — жёлтый с чёрной рамкой и оранжевым ? как на картинке
 function drawQBlock(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, frame: number) {
-  const bounce = Math.floor(frame / 8) % 4;
-  // основа
-  ctx.fillStyle = C.qblockYel;
+  // фон
+  ctx.fillStyle = C.qblockBg;
   ctx.fillRect(x, y, w, h);
-  // рамка
+  // светлые блики — верхний и левый край (изнутри рамки)
+  ctx.fillStyle = C.qblockLt;
+  ctx.fillRect(x + 2, y + 2, w - 4, 2);
+  ctx.fillRect(x + 2, y + 2, 2, h - 4);
+  // тёмная тень — правый и нижний (изнутри)
   ctx.fillStyle = C.qblockDk;
+  ctx.fillRect(x + 2, y + h - 4, w - 4, 2);
+  ctx.fillRect(x + w - 4, y + 2, 2, h - 4);
+  // чёрная внешняя рамка
+  ctx.fillStyle = C.qblockBorder;
   ctx.fillRect(x, y, w, 2);
   ctx.fillRect(x, y + h - 2, w, 2);
   ctx.fillRect(x, y, 2, h);
   ctx.fillRect(x + w - 2, y, 2, h);
-  ctx.fillStyle = C.qblockLt;
-  ctx.fillRect(x + 2, y + 2, w - 4, 2);
-  ctx.fillRect(x + 2, y + 2, 2, h - 4);
-  // символ ?
-  ctx.fillStyle = "#fff";
-  ctx.font = `bold ${Math.floor(h * 0.75)}px monospace`;
+  // угловые точки (декор как на картинке)
+  ctx.fillRect(x + 3, y + 3, 2, 2);
+  ctx.fillRect(x + w - 5, y + 3, 2, 2);
+  ctx.fillRect(x + 3, y + h - 5, 2, 2);
+  ctx.fillRect(x + w - 5, y + h - 5, 2, 2);
+  // символ ? — оранжевый как на картинке
+  const bob = Math.sin(frame * 0.1) > 0 ? 1 : 0;
+  ctx.fillStyle = "#c84000";
+  ctx.font = `bold ${Math.round(h * 0.65)}px monospace`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("?", x + w / 2 + (bounce > 1 ? 1 : 0), y + h / 2);
+  ctx.fillText("?", x + w / 2, y + h / 2 + bob);
 }
 
+// Каменный блок
 function drawStone(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = C.stoneMd;
   ctx.fillRect(x, y, w, h);
-  for (let ty = y; ty < y + h; ty += T) {
-    const rowOffset = (Math.floor((ty - y) / T) % 2) * (T / 2);
-    for (let tx = x - rowOffset; tx < x + w + T; tx += T) {
-      ctx.fillStyle = C.stoneDk;
-      ctx.fillRect(Math.max(x, tx + T - 1), ty, 1, T - 1);
-      ctx.fillRect(x, ty + T - 1, w, 1);
-      ctx.fillStyle = C.stoneLt;
-      ctx.fillRect(Math.max(x, tx), ty, Math.min(3, w), 1);
-      ctx.fillRect(Math.max(x, tx), ty, 1, Math.min(3, T - 1));
+  for (let row = 0; row * T < h; row++) {
+    const ty = y + row * T;
+    const shift = (row % 2) * (T / 2);
+    ctx.fillStyle = C.stoneDk;
+    ctx.fillRect(x, ty, w, 1);
+    for (let col = -1; col * T < w + T; col++) {
+      const tx = x + col * T + T - shift;
+      if (tx > x && tx < x + w) ctx.fillRect(tx, ty, 1, T);
     }
+    ctx.fillStyle = C.stoneLt;
+    ctx.fillRect(x, ty + 1, w, 1);
   }
   ctx.fillStyle = C.stoneLt;
   ctx.fillRect(x, y, w, 1);
-  ctx.fillRect(x, y, 1, h);
 }
 
+// Снег
 function drawSnow(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   ctx.fillStyle = C.snowMd;
   ctx.fillRect(x, y, w, h);
-  // снежная шапка
   ctx.fillStyle = C.snowWht;
-  ctx.fillRect(x, y, w, 6);
+  ctx.fillRect(x, y, w, 5);
   ctx.fillStyle = C.snowTop;
   ctx.fillRect(x, y, w, 2);
-  // текстура льда
   ctx.fillStyle = C.snowDk;
-  for (let ty = y + 6; ty < y + h; ty += T) {
-    ctx.fillRect(x, ty, w, 1);
-    for (let tx = x; tx < x + w; tx += T) {
-      ctx.fillRect(tx, ty, 1, T);
-      ctx.fillStyle = "rgba(255,255,255,0.3)";
-      ctx.fillRect(tx + 2, ty + 2, 4, 2);
-      ctx.fillStyle = C.snowDk;
-    }
+  for (let row = 1; row * T < h; row++) {
+    ctx.fillRect(x, y + row * T, w, 1);
+    for (let col = 0; col * T < w; col++) ctx.fillRect(x + col * T, y + row * T, 1, T);
   }
 }
 
+// Лава
 function drawLava(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, frame: number) {
   ctx.fillStyle = C.lavaMd;
   ctx.fillRect(x, y, w, h);
-  for (let ty = y + 4; ty < y + h; ty += T) {
-    for (let tx = x; tx < x + w; tx += T) {
+  for (let row = 0; row * T < h; row++) {
+    for (let col = 0; col * T < w; col++) {
       ctx.fillStyle = C.lavaDk;
-      ctx.fillRect(tx, ty, T - 1, T - 1);
+      ctx.fillRect(x + col * T, y + row * T, T - 1, T - 1);
       ctx.fillStyle = C.lavaLt;
-      ctx.fillRect(tx + 1, ty + 1, 3, 2);
+      ctx.fillRect(x + col * T + 1, y + row * T + 1, 3, 1);
     }
   }
-  // анимированный верх лавы
   ctx.fillStyle = C.lavaGlow;
-  ctx.fillRect(x, y, w, 4);
+  ctx.fillRect(x, y, w, 3);
   ctx.fillStyle = "#ff8800";
-  ctx.fillRect(x, y, w, 2);
-  // пузыри
-  const bubbleOffset = (frame * 2) % (w + 20);
+  ctx.fillRect(x, y, w, 1);
   ctx.fillStyle = "rgba(255,140,0,0.7)";
   ctx.beginPath();
-  ctx.arc(x + bubbleOffset % w, y + 1, 3, 0, Math.PI * 2);
+  ctx.arc(x + (frame * 2) % (w || 1), y + 1, 3, 0, Math.PI * 2);
   ctx.fill();
 }
 
+// Труба — тёмно-зелёная как на картинке
 function drawPipe(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  // тело трубы
-  ctx.fillStyle = C.pipeMd;
-  ctx.fillRect(x + 4, y + 16, w - 8, h - 16);
-  // тёмные полосы
+  const bw = Math.round(w * 0.75); // тело уже шапки
+  const bx = x + Math.round((w - bw) / 2);
+
+  // === ТЕЛО трубы ===
+  // левая тёмная полоса
   ctx.fillStyle = C.pipeDk;
-  ctx.fillRect(x + 4, y + 16, 4, h - 16);
-  ctx.fillStyle = C.pipeLt;
-  ctx.fillRect(x + 8, y + 16, 3, h - 16);
-  // голова трубы (шире)
+  ctx.fillRect(bx, y + 14, 4, h - 14);
+  // основной цвет
   ctx.fillStyle = C.pipeMd;
-  ctx.fillRect(x, y + 4, w, 12);
-  ctx.fillStyle = C.pipeDk;
-  ctx.fillRect(x, y + 4, 4, 12);
+  ctx.fillRect(bx + 4, y + 14, bw - 8, h - 14);
+  // светлая полоса блик
   ctx.fillStyle = C.pipeLt;
-  ctx.fillRect(x + 4, y + 4, 3, 12);
-  // верх голова
-  ctx.fillStyle = C.pipeDk;
-  ctx.fillRect(x, y, w, 5);
-  ctx.fillStyle = C.pipeMd;
-  ctx.fillRect(x, y + 1, w, 3);
-  ctx.fillStyle = C.pipeLt;
-  ctx.fillRect(x + 1, y + 1, w - 2, 1);
-  // блик на правом краю
+  ctx.fillRect(bx + 4, y + 14, 4, h - 14);
+  // тёмная правая тень
   ctx.fillStyle = C.pipeSh;
-  ctx.fillRect(x + w - 6, y + 4, 5, h - 4);
-  ctx.fillRect(x + w - 5, y + 16, 4, h - 16);
+  ctx.fillRect(bx + bw - 6, y + 14, 6, h - 14);
+  // шахматный паттерн тела (как на картинке)
+  for (let row = 0; row < Math.ceil((h - 14) / 8); row++) {
+    for (let col = 0; col < Math.ceil(bw / 8); col++) {
+      if ((row + col) % 2 === 1) {
+        ctx.fillStyle = "rgba(0,0,0,0.12)";
+        const px = bx + col * 8, py = y + 14 + row * 8;
+        ctx.fillRect(px, py, Math.min(8, bx + bw - px), Math.min(8, y + h - py));
+      }
+    }
+  }
+
+  // === ШАПКА трубы (шире) ===
+  ctx.fillStyle = C.pipeDk;
+  ctx.fillRect(x, y + 2, 4, 12);
+  ctx.fillStyle = C.pipeMd;
+  ctx.fillRect(x + 4, y + 2, w - 8, 12);
+  ctx.fillStyle = C.pipeLt;
+  ctx.fillRect(x + 4, y + 2, 5, 12);
+  ctx.fillStyle = C.pipeSh;
+  ctx.fillRect(x + w - 6, y + 2, 6, 12);
+  // верхняя кромка шапки
+  ctx.fillStyle = C.pipeDk;
+  ctx.fillRect(x, y, w, 3);
+  ctx.fillStyle = C.pipeLt;
+  ctx.fillRect(x + 2, y + 1, w - 4, 1);
+  // нижняя кромка шапки / стык с телом
+  ctx.fillStyle = C.pipeDk;
+  ctx.fillRect(x, y + 13, w, 1);
 }
 
 function drawPlatform(ctx: CanvasRenderingContext2D, pl: Platform, frame: number) {
@@ -359,87 +400,97 @@ function drawPlatform(ctx: CanvasRenderingContext2D, pl: Platform, frame: number
   if (pl.type === "pipe")   { drawPipe(ctx, pl.x, pl.y, pl.w, pl.h); return; }
 }
 
-// ── ВРАГИ ────────────────────────────────────────────────────────────────────
+// ── ВРАГИ (цвета с картинки: Гумба красно-коричневый) ───────────────────────
 function drawGoomba(ctx: CanvasRenderingContext2D, e: Enemy, frame: number) {
   const px = Math.round(e.x), py = Math.round(e.y);
+  const W2 = e.w, H2 = e.h;
+
   if (e.dead) {
-    ctx.fillStyle = "#6b3000";
-    ctx.fillRect(px, py + e.h - 7, e.w, 7);
-    ctx.fillStyle = "#8b4513";
-    ctx.fillRect(px + 2, py + e.h - 12, e.w - 4, 7);
+    // сплющенный — тонкая лепёшка
+    ctx.fillStyle = "#8b3000";
+    ctx.fillRect(px, py + H2 - 5, W2, 5);
+    ctx.fillStyle = "#c04010";
+    ctx.fillRect(px + 2, py + H2 - 8, W2 - 4, 4);
+    // глаза сплющены
     ctx.fillStyle = "#fff";
-    ctx.fillRect(px + 3, py + e.h - 11, 4, 3);
-    ctx.fillRect(px + e.w - 7, py + e.h - 11, 4, 3);
+    ctx.fillRect(px + 3, py + H2 - 7, 4, 2);
+    ctx.fillRect(px + W2 - 7, py + H2 - 7, 4, 2);
     return;
   }
-  const walk = Math.floor(frame / 10) % 2;
-  // ноги
-  ctx.fillStyle = "#3a1a00";
-  ctx.fillRect(px + (walk ? 2 : 0), py + e.h - 5, 8, 5);
-  ctx.fillRect(px + e.w - (walk ? 10 : 8), py + e.h - 5, 8, 5);
-  // тело
-  ctx.fillStyle = "#8b4513";
-  ctx.fillRect(px + 2, py + 8, e.w - 4, e.h - 12);
-  // голова
-  ctx.fillStyle = "#a0522d";
-  ctx.fillRect(px, py, e.w, 12);
-  // нависающие брови
-  ctx.fillStyle = "#3a1a00";
-  ctx.fillRect(px + 2, py + 2, 7, 3);
-  ctx.fillRect(px + e.w - 9, py + 2, 7, 3);
-  // угол бровей (angry)
-  ctx.fillRect(px + 2, py + 2, 2, 5);
-  ctx.fillRect(px + e.w - 4, py + 2, 2, 5);
-  // белки глаз
-  ctx.fillStyle = "#fff";
+
+  const walk = Math.floor(frame / 9) % 2;
+
+  // ── ноги (коричневые, анимированные) ──
+  ctx.fillStyle = "#3a1000";
+  if (walk === 0) {
+    ctx.fillRect(px + 1,     py + H2 - 6, 9, 6);   // лев вниз
+    ctx.fillRect(px + W2 - 8, py + H2 - 4, 8, 4);  // прав вверх
+  } else {
+    ctx.fillRect(px + 1,     py + H2 - 4, 9, 4);
+    ctx.fillRect(px + W2 - 8, py + H2 - 6, 8, 6);
+  }
+
+  // ── тело (красно-коричневое как на картинке) ──
+  ctx.fillStyle = "#c04010";
+  ctx.fillRect(px + 2, py + 8, W2 - 4, H2 - 13);
+
+  // ── голова (чуть светлее, широкая) ──
+  ctx.fillStyle = "#c84818";
+  ctx.fillRect(px, py, W2, 11);
+  // выступ голова по бокам шире тела
+  ctx.fillRect(px - 1, py + 2, W2 + 2, 9);
+
+  // ── брови — нависают внутрь (злые) ──
+  ctx.fillStyle = "#2a0800";
+  ctx.fillRect(px + 1, py + 2, 8, 3);
+  ctx.fillRect(px + W2 - 9, py + 2, 8, 3);
+  ctx.fillRect(px + 1, py + 2, 2, 5);         // внутренний угол лев
+  ctx.fillRect(px + W2 - 3, py + 2, 2, 5);    // внутренний угол прав
+
+  // ── белки глаз ──
+  ctx.fillStyle = "#ffffff";
   ctx.fillRect(px + 3, py + 4, 6, 5);
-  ctx.fillRect(px + e.w - 9, py + 4, 6, 5);
-  // зрачки
-  ctx.fillStyle = "#000";
+  ctx.fillRect(px + W2 - 9, py + 4, 6, 5);
+  // ── зрачки ──
+  ctx.fillStyle = "#000000";
   ctx.fillRect(px + 5, py + 5, 3, 3);
-  ctx.fillRect(px + e.w - 7, py + 5, 3, 3);
-  // усики
-  ctx.fillStyle = "#3a1a00";
-  ctx.fillRect(px + 1, py + 10, 4, 1);
-  ctx.fillRect(px + e.w - 5, py + 10, 4, 1);
+  ctx.fillRect(px + W2 - 7, py + 5, 3, 3);
+
+  // ── зубы (белый прямоугольник снизу) ──
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(px + 3, py + 8, 5, 2);
+  ctx.fillRect(px + W2 - 8, py + 8, 5, 2);
+  ctx.fillStyle = "#2a0800";
+  ctx.fillRect(px + 7, py + 8, 1, 2);
+  ctx.fillRect(px + W2 - 5, py + 8, 1, 2);
 }
 
 function drawKoopa(ctx: CanvasRenderingContext2D, e: Enemy, frame: number) {
   const px = Math.round(e.x), py = Math.round(e.y);
   if (e.dead) {
-    ctx.fillStyle = "#1a6600";
+    ctx.fillStyle = "#286300";
     ctx.fillRect(px + 2, py + 2, e.w - 4, e.h - 4);
     ctx.fillStyle = "#f0c000";
     ctx.fillRect(px + 5, py + 5, e.w - 10, e.h - 10);
-    // крестообразный шов
-    ctx.fillStyle = "#1a6600";
-    ctx.fillRect(px + 5, py + (e.h / 2) - 1, e.w - 10, 2);
-    ctx.fillRect(px + (e.w / 2) - 1, py + 5, 2, e.h - 10);
+    ctx.fillStyle = "#286300";
+    ctx.fillRect(px + 5, py + e.h / 2 - 1, e.w - 10, 2);
+    ctx.fillRect(px + e.w / 2 - 1, py + 5, 2, e.h - 10);
     return;
   }
   const walk = Math.floor(frame / 10) % 2;
-  // ноги
   ctx.fillStyle = "#5ab82a";
   ctx.fillRect(px + (walk ? 0 : 2), py + e.h - 6, 9, 6);
   ctx.fillRect(px + e.w - (walk ? 9 : 11), py + e.h - 6, 9, 6);
-  // панцирь
-  ctx.fillStyle = "#1a8000";
+  ctx.fillStyle = "#286300";
   ctx.fillRect(px + 2, py + 6, e.w - 4, e.h - 8);
   ctx.fillStyle = "#f0c000";
   ctx.fillRect(px + 5, py + 9, e.w - 10, e.h - 16);
-  ctx.fillStyle = "#1a8000";
-  // швы панциря
-  for (let i = 0; i < 3; i++) {
-    ctx.fillRect(px + 5, py + 9 + i * 4, e.w - 10, 1);
-  }
-  ctx.fillRect(px + (e.w / 2) - 1, py + 9, 1, e.h - 16);
-  // шея
+  ctx.fillStyle = "#286300";
+  for (let i = 0; i < 3; i++) ctx.fillRect(px + 5, py + 9 + i * 4, e.w - 10, 1);
+  ctx.fillRect(px + e.w / 2 - 1, py + 9, 1, e.h - 16);
   ctx.fillStyle = "#5ab82a";
   ctx.fillRect(px + 5, py + 1, e.w - 10, 7);
-  // голова
-  ctx.fillStyle = "#5ab82a";
   ctx.fillRect(px + 4, py - 5, e.w - 8, 8);
-  // глаза
   ctx.fillStyle = "#fff";
   ctx.fillRect(px + 5, py - 4, 5, 4);
   ctx.fillRect(px + e.w - 10, py - 4, 5, 4);
@@ -448,114 +499,104 @@ function drawKoopa(ctx: CanvasRenderingContext2D, e: Enemy, frame: number) {
   ctx.fillRect(px + e.w - 8, py - 3, 2, 2);
 }
 
-// ── МАРИО ────────────────────────────────────────────────────────────────────
+// ── МАРИО (цвета как на картинке: коричнево-красный костюм, бежевое лицо) ──
 function drawMario(ctx: CanvasRenderingContext2D, x: number, y: number, facingRight: boolean, walkAnim: number, onGround: boolean, dead: boolean) {
   const px = Math.round(x), py = Math.round(y);
   ctx.save();
   if (!facingRight) {
-    ctx.translate(px + 24, py);
+    ctx.translate(px + 24, 0);
     ctx.scale(-1, 1);
-    ctx.translate(-px, -py);
+    ctx.translate(-px, 0);
   }
 
+  // Цвета с картинки — пипеткой
+  const HAT    = "#b83010";  // тёмно-красная кепка
+  const SKIN   = "#e8a868";  // бежево-оранжевое лицо/руки
+  const SHIRT  = "#b83010";  // красная рубашка
+  const PANTS  = "#8b5000";  // коричневые штаны/комбинезон
+  const BOOT   = "#503000";  // тёмно-коричневые ботинки
+  const HAIR   = "#503000";  // тёмно-коричневые усы/волосы
+  const BLACK  = "#000000";
+
   if (dead) {
-    // кепка
-    ctx.fillStyle = "#e40000"; ctx.fillRect(px + 3, py - 1, 18, 4);
-    ctx.fillRect(px + 7, py - 6, 10, 5);
-    // лицо
-    ctx.fillStyle = "#fba870"; ctx.fillRect(px + 4, py + 3, 16, 10);
-    // тело перевёрнутое (подбрасывание)
-    ctx.fillStyle = "#0038a8"; ctx.fillRect(px + 5, py + 13, 14, 10);
-    ctx.fillStyle = "#e40000"; ctx.fillRect(px + 5, py + 13, 5, 8);
-    ctx.fillRect(px + 14, py + 13, 5, 8);
+    ctx.fillStyle = HAT;    ctx.fillRect(px + 3, py,     18, 4);
+    ctx.fillStyle = HAT;    ctx.fillRect(px + 7, py - 6, 10, 6);
+    ctx.fillStyle = SKIN;   ctx.fillRect(px + 4, py + 4, 16, 9);
+    ctx.fillStyle = SHIRT;  ctx.fillRect(px + 5, py + 13, 14, 9);
+    ctx.fillStyle = PANTS;  ctx.fillRect(px + 5, py + 20, 14, 7);
     ctx.restore();
     return;
   }
 
-  const legPhase = onGround ? Math.sin(walkAnim * 0.3) : 0;
-  const airPose = !onGround;
+  const lp = onGround ? Math.sin(walkAnim * 0.3) : 0;
+  const air = !onGround;
+  const lA = Math.round(lp * 4);
 
   // === КЕПКА ===
-  ctx.fillStyle = "#e40000";
-  ctx.fillRect(px + 2, py, 20, 5);          // козырёк
-  ctx.fillRect(px + 6, py - 7, 12, 7);      // верх кепки
-  // белый край кепки
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(px + 6, py - 1, 12, 1);
+  ctx.fillStyle = HAT;
+  ctx.fillRect(px + 2, py,      20, 4);    // козырёк
+  ctx.fillRect(px + 6, py - 7,  12, 7);    // верх
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px + 6, py - 1,  12, 1);    // тёмная граница кепки/лба
 
-  // === ВОЛОСЫ (тёмно-коричневые) ===
-  ctx.fillStyle = "#6b3000";
-  ctx.fillRect(px + 6, py + 2, 4, 3);
-  ctx.fillRect(px + 16, py + 2, 4, 3);
+  // === ВОЛОСЫ ===
+  ctx.fillStyle = HAIR;
+  ctx.fillRect(px + 6,  py + 1, 4, 3);
+  ctx.fillRect(px + 14, py + 1, 4, 3);
 
   // === ЛИЦО ===
-  ctx.fillStyle = "#fba870";
-  ctx.fillRect(px + 4, py + 4, 16, 10);
-
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px + 4, py + 3, 16, 9);
   // глаза
-  ctx.fillStyle = "#000";
-  ctx.fillRect(px + 7, py + 6, 3, 3);
-  ctx.fillRect(px + 14, py + 6, 3, 3);
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(px + 8, py + 6, 1, 1);
-  ctx.fillRect(px + 15, py + 6, 1, 1);
-
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px + 7,  py + 5, 3, 3);
+  ctx.fillRect(px + 14, py + 5, 3, 3);
   // нос
-  ctx.fillStyle = "#e07a50";
-  ctx.fillRect(px + 12, py + 9, 4, 3);
+  ctx.fillStyle = SKIN;
+  ctx.fillRect(px + 13, py + 8, 5, 3);
+  ctx.fillStyle = BLACK;
+  ctx.fillRect(px + 13, py + 8, 1, 1);
 
-  // === УСЫ ===
-  ctx.fillStyle = "#6b3000";
-  ctx.fillRect(px + 6, py + 11, 12, 3);
-  // форма усов
-  ctx.fillStyle = "#fba870";
-  ctx.fillRect(px + 11, py + 11, 2, 1);
+  // === УСИКИ ===
+  ctx.fillStyle = HAIR;
+  ctx.fillRect(px + 6, py + 10, 12, 2);
 
-  // === РУБАШКА (красная) ===
-  ctx.fillStyle = "#e40000";
-  ctx.fillRect(px + 4, py + 14, 16, 10);
-  // воротник
-  ctx.fillStyle = "#fff";
-  ctx.fillRect(px + 9, py + 14, 6, 2);
-
-  // === КОМБИНЕЗОН (синий) ===
-  ctx.fillStyle = "#0038a8";
-  ctx.fillRect(px + 4, py + 21, 16, 7);
-  // пуговицы
-  ctx.fillStyle = "#f0c000";
-  ctx.fillRect(px + 7, py + 22, 3, 3);
-  ctx.fillRect(px + 14, py + 22, 3, 3);
-
+  // === РУБАШКА ===
+  ctx.fillStyle = SHIRT;
+  ctx.fillRect(px + 4, py + 12, 16, 8);
   // === РУКИ ===
-  ctx.fillStyle = "#fba870";
-  if (airPose) {
-    ctx.fillRect(px + 1,  py + 16, 4, 6);
-    ctx.fillRect(px + 19, py + 14, 4, 6);
+  ctx.fillStyle = SKIN;
+  if (air) {
+    ctx.fillRect(px + 0,  py + 14, 4, 5);
+    ctx.fillRect(px + 20, py + 12, 4, 5);
   } else {
-    ctx.fillRect(px + 1,  py + 14 + Math.round(legPhase * 2), 4, 6);
-    ctx.fillRect(px + 19, py + 14 - Math.round(legPhase * 2), 4, 6);
+    ctx.fillRect(px + 0,  py + 13 + Math.round(lp * 2), 4, 5);
+    ctx.fillRect(px + 20, py + 13 - Math.round(lp * 2), 4, 5);
   }
 
+  // === ШТАНЫ/КОМБИНЕЗОН ===
+  ctx.fillStyle = PANTS;
+  ctx.fillRect(px + 4, py + 20, 16, 8);
+  // подтяжки
+  ctx.fillStyle = SHIRT;
+  ctx.fillRect(px + 6,  py + 20, 3, 5);
+  ctx.fillRect(px + 15, py + 20, 3, 5);
+
   // === НОГИ ===
-  if (airPose) {
-    ctx.fillStyle = "#0038a8";
+  if (air) {
+    ctx.fillStyle = PANTS;
     ctx.fillRect(px + 4,  py + 28, 8, 5);
-    ctx.fillRect(px + 12, py + 26, 8, 5);
-    ctx.fillStyle = "#5a2a00";
+    ctx.fillRect(px + 12, py + 25, 8, 5);
+    ctx.fillStyle = BOOT;
     ctx.fillRect(px + 2,  py + 32, 11, 4);
-    ctx.fillRect(px + 11, py + 30, 11, 4);
+    ctx.fillRect(px + 11, py + 29, 11, 4);
   } else {
-    const lA = Math.round(legPhase * 4);
-    ctx.fillStyle = "#0038a8";
+    ctx.fillStyle = PANTS;
     ctx.fillRect(px + 4,  py + 28, 8, 5 + lA);
     ctx.fillRect(px + 12, py + 28, 8, 5 - lA);
-    ctx.fillStyle = "#5a2a00";
+    ctx.fillStyle = BOOT;
     ctx.fillRect(px + 2,  py + 32 + lA, 11, 4);
     ctx.fillRect(px + 11, py + 32 - lA, 11, 4);
-    // блик на ботинках
-    ctx.fillStyle = "#7a4220";
-    ctx.fillRect(px + 3,  py + 32 + lA, 3, 1);
-    ctx.fillRect(px + 12, py + 32 - lA, 3, 1);
   }
 
   ctx.restore();
@@ -624,83 +665,111 @@ function drawFinish(ctx: CanvasRenderingContext2D, fx: number, fy: number, fgy: 
   }
 }
 
+// ── ОБЛАКО (точно как на картинке: белое с голубыми пикселями снизу) ─────────
+function drawCloud(ctx: CanvasRenderingContext2D, cx: number, cy: number, scale: number) {
+  const s = scale;
+  // Форма облака с картинки — пиксельный blob
+  const pixels: [number, number, number, number, string][] = [
+    // [dx, dy, w, h, color]
+    [6,  12, 36, 8,  "#ffffff"],
+    [2,  8,  44, 10, "#ffffff"],
+    [0,  4,  48, 10, "#ffffff"],
+    [4,  0,  40, 6,  "#ffffff"],
+    [10, -4, 28, 6,  "#ffffff"],
+    // голубые акценты снизу (точно с картинки)
+    [4,  18, 6,  2,  "#80d0e8"],
+    [14, 20, 8,  2,  "#80d0e8"],
+    [26, 20, 6,  2,  "#80d0e8"],
+    [36, 18, 8,  2,  "#80d0e8"],
+    // чёрные края (пиксельная обводка)
+    [0,   4, 2,  16, "#000"],
+    [46,  4, 2,  16, "#000"],
+    [4,   0, 40, 2,  "#000"],
+    [4,  20, 40, 2,  "#000"],
+    [2,   2, 2,  2,  "#000"],
+    [44,  2, 2,  2,  "#000"],
+  ];
+  for (const [dx, dy, w, h, color] of pixels) {
+    ctx.fillStyle = color;
+    ctx.fillRect(cx + dx * s, cy + dy * s, w * s, h * s);
+  }
+}
+
 // ── ФОН ──────────────────────────────────────────────────────────────────────
 function drawBackground(ctx: CanvasRenderingContext2D, lvl: LevelData, frame: number, lvlIdx: number) {
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, lvl.bg); grad.addColorStop(1, lvl.bgColor2);
-  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+  // Небо — точный цвет с картинки #6b8cff
+  ctx.fillStyle = lvl.bg;
+  ctx.fillRect(0, 0, W, H);
 
   if (lvlIdx === 0) {
-    // NES-стиль облака: белые прямоугольные с пиксельными краями
-    const clouds = [[60, 50], [220, 70], [420, 45], [610, 65]];
-    for (const [cx, cy] of clouds) {
-      const bx = cx + Math.sin(frame * 0.005 + cx * 0.1) * 2;
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(bx + 12, cy, 30, 10);
-      ctx.fillRect(bx + 6,  cy + 6, 42, 10);
-      ctx.fillRect(bx,      cy + 12, 54, 10);
-      ctx.fillRect(bx + 4,  cy + 4, 6, 4);
-      ctx.fillRect(bx + 22, cy - 4, 16, 6);
-      ctx.fillRect(bx + 44, cy + 4, 6, 4);
+    // Облака из картинки (медленно плывут)
+    const cloudPositions = [
+      [40  + (frame * 0.15) % W,        55, 0.9],
+      [280 + (frame * 0.10) % W,        45, 1.1],
+      [520 + (frame * 0.12) % W,        60, 0.8],
+    ];
+    for (const [cx, cy, sc] of cloudPositions) {
+      drawCloud(ctx, (cx % (W + 60)) - 10, cy, sc);
     }
-    // пиксельные кусты
-    const bushes = [[100, 355], [320, 358], [520, 354], [700, 356]];
+
+    // Пиксельные кусты (зелёные, как на картинке)
+    const bushes: [number, number][] = [[95, 356], [310, 358], [510, 355], [690, 357]];
     for (const [bx, by] of bushes) {
       ctx.fillStyle = "#00a800";
-      ctx.fillRect(bx, by, 48, 14);
-      ctx.fillRect(bx + 8, by - 8, 32, 10);
+      ctx.fillRect(bx,      by,      48, 12);
+      ctx.fillRect(bx + 8,  by - 8,  32, 10);
       ctx.fillRect(bx + 16, by - 14, 16, 8);
-      ctx.fillStyle = "#00d000";
-      ctx.fillRect(bx + 2, by, 4, 6);
-      ctx.fillRect(bx + 10, by - 6, 4, 4);
-      ctx.fillRect(bx + 20, by - 12, 4, 4);
+      ctx.fillStyle = "#00cc00";
+      ctx.fillRect(bx + 2,  by,      4,  4);
+      ctx.fillRect(bx + 10, by - 6,  4,  4);
+      ctx.fillRect(bx + 20, by - 12, 4,  4);
+      // тёмный низ
+      ctx.fillStyle = "#006000";
+      ctx.fillRect(bx, by + 10, 48, 2);
     }
   } else if (lvlIdx === 1) {
-    // снежинки NES-стиль
-    for (let i = 0; i < 24; i++) {
+    // Снег
+    for (let i = 0; i < 28; i++) {
       const sx = ((i * 137 + frame * 0.4) % (W + 10)) - 5;
-      const sy = ((i * 61  + frame * 0.6) % H);
-      ctx.fillStyle = "rgba(255,255,255,0.8)";
+      const sy = ((i * 61  + frame * 0.7) % H);
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
       ctx.fillRect(sx, sy, 2, 2);
-      ctx.fillRect(sx + 1, sy - 1, 2, 2); // крест
+      ctx.fillRect(sx + 1, sy - 1, 2, 2);
       ctx.fillRect(sx - 1, sy + 1, 2, 2);
     }
-    // пиксельные горы
+    // горы
     ctx.fillStyle = "#90b8d0";
-    [[0, 200, 200, 370], [160, 150, 260, 370], [340, 120, 300, 370], [560, 160, 260, 370]].forEach(([mx, my, mw, mh]) => {
-      ctx.beginPath(); ctx.moveTo(mx, mh); ctx.lineTo(mx + mw / 2, my); ctx.lineTo(mx + mw, mh); ctx.closePath(); ctx.fill();
-    });
-    // снежные вершины
-    ctx.fillStyle = "#fff";
-    [[100, 200, 40], [260, 150, 50], [490, 160, 40]].forEach(([mx, my, mw]) => {
-      ctx.beginPath(); ctx.moveTo(mx - mw, my + 30); ctx.lineTo(mx, my); ctx.lineTo(mx + mw, my + 30); ctx.closePath(); ctx.fill();
-    });
-  } else {
-    // огненное небо
-    const lvg = ctx.createLinearGradient(0, H, 0, H - 120);
-    lvg.addColorStop(0, "rgba(255,60,0,0.7)"); lvg.addColorStop(1, "rgba(255,60,0,0)");
-    ctx.fillStyle = lvg; ctx.fillRect(0, H - 120, W, 120);
-    // пиксельные «зубцы» замка
-    ctx.fillStyle = "#2a0800";
-    for (let bx = 0; bx < W; bx += 60) {
-      ctx.fillRect(bx, 0, 30, 40);
+    for (const [mx, my, mw] of [[0,200,200],[160,150,260],[340,120,300],[560,160,240]]) {
+      ctx.beginPath(); ctx.moveTo(mx, 370); ctx.lineTo(mx + mw/2, my); ctx.lineTo(mx + mw, 370); ctx.closePath(); ctx.fill();
     }
+    ctx.fillStyle = "#fff";
+    for (const [mx, my, mw] of [[100,200,36],[265,150,46],[490,160,38]]) {
+      ctx.beginPath(); ctx.moveTo(mx - mw, my + 28); ctx.lineTo(mx, my); ctx.lineTo(mx + mw, my + 28); ctx.closePath(); ctx.fill();
+    }
+  } else {
+    // замок — огненное небо
+    const lvg = ctx.createLinearGradient(0, H, 0, H - 130);
+    lvg.addColorStop(0, "rgba(255,60,0,0.75)"); lvg.addColorStop(1, "rgba(255,60,0,0)");
+    ctx.fillStyle = lvg; ctx.fillRect(0, H - 130, W, 130);
+    // зубцы замка
+    ctx.fillStyle = "#2a0800";
+    for (let bx = 0; bx < W; bx += 56) ctx.fillRect(bx, 0, 28, 38);
     // пузыри лавы
     for (let i = 0; i < 6; i++) {
       const bx = 60 + i * 120;
-      const by = H - 15 + Math.sin(frame * 0.06 + i * 1.2) * 6;
+      const by = H - 14 + Math.sin(frame * 0.06 + i * 1.2) * 6;
       const br = 5 + Math.sin(frame * 0.09 + i * 0.8) * 3;
-      ctx.fillStyle = "rgba(255,100,0,0.6)";
+      ctx.fillStyle = "rgba(255,100,0,0.65)";
       ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
     }
     // факелы
-    for (const tx of [48, W - 52]) {
-      ctx.fillStyle = "#5a2a00"; ctx.fillRect(tx, 290, 8, 60);
-      const fl = Math.sin(frame * 0.15 + tx) * 3;
+    for (const tx of [44, W - 50]) {
+      ctx.fillStyle = "#5a2a00"; ctx.fillRect(tx, 285, 8, 68);
+      const fl = Math.sin(frame * 0.18 + tx) * 3;
       ctx.fillStyle = "#ff6600";
-      ctx.beginPath(); ctx.moveTo(tx, 290); ctx.lineTo(tx + 4, 270 + fl); ctx.lineTo(tx + 8, 290); ctx.closePath(); ctx.fill();
-      ctx.fillStyle = "#ffcc00";
-      ctx.beginPath(); ctx.moveTo(tx + 1, 290); ctx.lineTo(tx + 4, 278 + fl); ctx.lineTo(tx + 7, 290); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(tx, 285); ctx.lineTo(tx + 4, 265 + fl); ctx.lineTo(tx + 8, 285); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#ffdd00";
+      ctx.beginPath(); ctx.moveTo(tx + 1, 285); ctx.lineTo(tx + 4, 274 + fl); ctx.lineTo(tx + 7, 285); ctx.closePath(); ctx.fill();
     }
   }
 }
