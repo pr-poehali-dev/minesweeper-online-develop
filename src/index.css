@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,96 +8,686 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* МиноИскатель — Classic Theme */
+    --ms-bg: #c0c0c0;
+    --ms-bg-dark: #a8a8a8;
+    --ms-surface: #c0c0c0;
+    --ms-primary: #000080;
+    --ms-primary-light: #0000aa;
+    --ms-danger: #cc0000;
+    --ms-success: #006600;
+    --ms-muted: #555555;
+    --ms-border-light: #ffffff;
+    --ms-border-dark: #808080;
+    --ms-border-darker: #404040;
+    --ms-cell-hidden: #c0c0c0;
+    --ms-cell-open: #d0d0d0;
+    --ms-titlebar: #000080;
+    --ms-titlebar-text: #ffffff;
+    --ms-num1: #0000ff;
+    --ms-num2: #007b00;
+    --ms-num3: #ff0000;
+    --ms-num4: #00007b;
+    --ms-num5: #7b0000;
+    --ms-num6: #007b7b;
+    --ms-num7: #000000;
+    --ms-num8: #7b7b7b;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  .ms-dark {
+    --ms-bg: #1a1a2e;
+    --ms-bg-dark: #16213e;
+    --ms-surface: #0f3460;
+    --ms-primary: #e94560;
+    --ms-primary-light: #ff6b8a;
+    --ms-danger: #ff4444;
+    --ms-success: #44ff88;
+    --ms-muted: #8888aa;
+    --ms-border-light: #334466;
+    --ms-border-dark: #0a0a1a;
+    --ms-border-darker: #050510;
+    --ms-cell-hidden: #1e3a5f;
+    --ms-cell-open: #0d2137;
+    --ms-titlebar: #0f3460;
+    --ms-titlebar-text: #e94560;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* === LAYOUT === */
+  .ms-light {
+    background-color: var(--ms-bg);
+    min-height: 100vh;
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .ms-dark {
+    background-color: var(--ms-bg);
+    min-height: 100vh;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  /* === TITLEBAR === */
+  .ms-titlebar {
+    background-color: var(--ms-titlebar);
+    color: var(--ms-titlebar-text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    font-family: "VT323", monospace;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+
+  .ms-win-btn {
+    width: 20px;
+    height: 18px;
+    background: var(--ms-bg);
+    color: var(--ms-border-darker);
+    border: 2px outset var(--ms-border-light);
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: monospace;
+    margin-left: 2px;
+  }
+  .ms-win-close {
+    color: var(--ms-danger);
+  }
+
+  /* === MENUBAR === */
+  .ms-menubar {
+    background-color: var(--ms-bg);
+    border-bottom: 2px solid var(--ms-border-dark);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 2px 4px;
+  }
+  .ms-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    color: var(--ms-border-darker);
+    background: transparent;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.1s;
+    white-space: nowrap;
+  }
+  .ms-menu-item:hover {
+    border: 2px inset var(--ms-border-dark);
+    background: var(--ms-bg-dark);
+  }
+  .ms-menu-active {
+    border: 2px inset var(--ms-border-dark) !important;
+    background: var(--ms-primary) !important;
+    color: white !important;
+  }
+
+  /* === PANEL === */
+  .ms-panel {
+    background: var(--ms-surface);
+    border: 3px solid;
+    border-color: var(--ms-border-light) var(--ms-border-darker)
+      var(--ms-border-darker) var(--ms-border-light);
+    padding: 12px 16px;
+    box-shadow: 2px 2px 0 var(--ms-border-dark);
+  }
+  .ms-panel-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ms-border-darker);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--ms-border-dark);
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+  }
+
+  /* === STATUS BAR === */
+  .ms-statusbar {
+    background-color: var(--ms-bg);
+    border-top: 2px solid var(--ms-border-dark);
+    padding: 3px 8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ms-muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* === DISPLAY (digit counter) === */
+  .ms-display {
+    background: #000;
+    border: 2px inset var(--ms-border-dark);
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  /* === FACE BUTTON === */
+  .ms-face-btn {
+    width: 34px;
+    height: 34px;
+    background: var(--ms-bg);
+    border: 3px outset var(--ms-border-light);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+  }
+  .ms-face-btn:active,
+  .ms-face-win,
+  .ms-face-lose {
+    border-style: inset;
+  }
+
+  /* === BUTTONS === */
+  .ms-btn-primary {
+    background: var(--ms-primary);
+    color: white;
+    border: 3px outset var(--ms-border-light);
+    padding: 8px 20px;
+    font-family: "VT323", monospace;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .ms-btn-primary:hover {
+    background: var(--ms-primary-light);
+  }
+  .ms-btn-primary:active {
+    border-style: inset;
+    transform: translate(1px, 1px);
+  }
+
+  .ms-btn-secondary {
+    background: var(--ms-bg);
+    color: var(--ms-border-darker);
+    border: 3px outset var(--ms-border-light);
+    padding: 6px 14px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ms-btn-secondary:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-btn-secondary:active {
+    border-style: inset;
+  }
+
+  /* === MODE CARDS === */
+  .ms-mode-card {
+    background: var(--ms-surface);
+    border: 3px outset var(--ms-border-light);
+    padding: 16px 12px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.1s;
+    font-family: "VT323", monospace;
+    color: var(--ms-border-darker);
+  }
+  .ms-mode-card:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-mode-selected {
+    border-style: inset !important;
+    background: var(--ms-primary) !important;
+    color: white !important;
+  }
+  .ms-mode-selected .text-ms-muted {
+    color: #aaccff !important;
+  }
+
+  /* === DIFFICULTY CARDS === */
+  .ms-diff-card {
+    background: var(--ms-surface);
+    border: 3px outset var(--ms-border-light);
+    padding: 12px 8px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.1s;
+    font-family: "VT323", monospace;
+    color: var(--ms-border-darker);
+  }
+  .ms-diff-card:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-diff-selected {
+    border-style: inset !important;
+    background: var(--ms-bg-dark) !important;
+    outline: 2px solid var(--ms-primary);
+  }
+
+  /* === BOARD === */
+  .ms-board-container {
+    background: var(--ms-bg);
+    border: 3px inset var(--ms-border-dark);
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  .ms-board {
+    background: var(--ms-bg);
+  }
+
+  /* === CELLS === */
+  .ms-cell {
+    background: var(--ms-cell-hidden);
+    border: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 700;
+    user-select: none;
+    transition: none;
+    box-sizing: border-box;
+  }
+  .ms-cell-hidden {
+    border: 3px outset var(--ms-border-light);
+  }
+  .ms-cell-hidden:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-cell-hidden:active {
+    border-style: inset;
+  }
+  .ms-cell-open {
+    border: 1px solid var(--ms-border-dark);
+    background: var(--ms-cell-open);
+    cursor: default;
+  }
+  .ms-cell-mine {
+    background: var(--ms-danger) !important;
+    border: 1px solid var(--ms-border-darker);
+  }
+  .ms-cell-flagged {
+    border: 3px outset var(--ms-border-light);
+  }
+
+  /* === NUMBER COLORS === */
+  .text-ms-num1 {
+    color: var(--ms-num1);
+  }
+  .text-ms-num2 {
+    color: var(--ms-num2);
+  }
+  .text-ms-num3 {
+    color: var(--ms-num3);
+  }
+  .text-ms-num4 {
+    color: var(--ms-num4);
+  }
+  .text-ms-num5 {
+    color: var(--ms-num5);
+  }
+  .text-ms-num6 {
+    color: var(--ms-num6);
+  }
+  .text-ms-num7 {
+    color: var(--ms-num7);
+  }
+  .text-ms-num8 {
+    color: var(--ms-num8);
+  }
+
+  /* === RESULT BANNER === */
+  .ms-result-banner {
+    border: 3px solid;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: "VT323", monospace;
+    box-shadow: 3px 3px 0 var(--ms-border-dark);
+  }
+  .ms-result-win {
+    background: #ccffcc;
+    border-color: var(--ms-success) var(--ms-border-darker)
+      var(--ms-border-darker) var(--ms-success);
+    color: var(--ms-success);
+  }
+  .ms-result-lose {
+    background: #ffcccc;
+    border-color: var(--ms-border-light) var(--ms-danger) var(--ms-danger)
+      var(--ms-border-light);
+    color: var(--ms-danger);
+  }
+
+  /* === BADGES === */
+  .ms-badge {
+    background: var(--ms-bg-dark);
+    border: 1px solid var(--ms-border-dark);
+    padding: 1px 6px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ms-border-darker);
+    display: inline-block;
+  }
+  .ms-badge-muted {
+    color: var(--ms-muted);
+  }
+  .ms-badge-danger {
+    background: var(--ms-danger);
+    color: white;
+    border-color: #990000;
+  }
+  .ms-badge-success {
+    background: var(--ms-success);
+    color: white;
+    border-color: #004400;
+  }
+
+  /* === STATS === */
+  .ms-stat-card {
+    background: var(--ms-surface);
+    border: 3px inset var(--ms-border-dark);
+    padding: 16px 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .ms-progress-bar {
+    height: 12px;
+    background: var(--ms-bg-dark);
+    border: 2px inset var(--ms-border-dark);
+    overflow: hidden;
+  }
+  .ms-progress-fill {
+    height: 100%;
+    background: var(--ms-primary);
+    transition: width 0.5s ease;
+  }
+  .ms-history-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: var(--ms-bg);
+    border: 1px solid var(--ms-border-dark);
+    font-size: 12px;
+  }
+
+  /* === LEADERBOARD === */
+  .ms-lb-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: var(--ms-primary);
+    color: white;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .ms-lb-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    background: var(--ms-bg);
+    border: 1px solid var(--ms-border-dark);
+    font-size: 12px;
+    transition: background 0.1s;
+  }
+  .ms-lb-row:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-lb-top {
+    background: #fffff0 !important;
+    border-color: #cccc00 !important;
+  }
+  .ms-lb-top:hover {
+    background: #ffffd0 !important;
+  }
+
+  /* === FILTER BUTTONS === */
+  .ms-filter-btn {
+    padding: 3px 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    background: var(--ms-bg);
+    border: 2px outset var(--ms-border-light);
+    cursor: pointer;
+    color: var(--ms-border-darker);
+    transition: all 0.1s;
+  }
+  .ms-filter-btn:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-filter-active {
+    border-style: inset !important;
+    background: var(--ms-primary) !important;
+    color: white !important;
+  }
+
+  /* === SETTINGS === */
+  .ms-input {
+    background: white;
+    border: 3px inset var(--ms-border-dark);
+    padding: 6px 10px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    color: var(--ms-border-darker);
+    outline: none;
+  }
+  .ms-input:focus {
+    border-color: var(--ms-primary);
+  }
+  .ms-theme-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--ms-bg);
+    border: 3px outset var(--ms-border-light);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--ms-border-darker);
+    transition: all 0.1s;
+  }
+  .ms-theme-btn:hover {
+    background: var(--ms-bg-dark);
+  }
+  .ms-theme-selected {
+    border-style: inset !important;
+    background: var(--ms-bg-dark) !important;
+    outline: 2px solid var(--ms-primary);
+  }
+  .ms-toggle {
+    width: 44px;
+    height: 22px;
+    border: 3px inset var(--ms-border-dark);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .ms-toggle-on {
+    background: var(--ms-primary);
+  }
+  .ms-toggle-off {
+    background: var(--ms-bg-dark);
+  }
+  .ms-toggle-thumb {
+    position: absolute;
+    top: 1px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border: 1px solid var(--ms-border-dark);
+    transition: left 0.2s;
+  }
+  .ms-toggle-on .ms-toggle-thumb {
+    left: calc(100% - 15px);
+  }
+  .ms-toggle-off .ms-toggle-thumb {
+    left: 1px;
+  }
+
+  /* === RULES === */
+  .ms-rule-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background: var(--ms-bg);
+    border: 1px solid var(--ms-border-dark);
+  }
+  .ms-key {
+    background: var(--ms-bg-dark);
+    border: 2px outset var(--ms-border-light);
+    padding: 2px 8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* === COLORS === */
+  .text-ms-primary {
+    color: var(--ms-primary);
+  }
+  .text-ms-muted {
+    color: var(--ms-muted);
+  }
+  .text-ms-danger {
+    color: var(--ms-danger);
+  }
+  .text-ms-success {
+    color: var(--ms-success);
+  }
+  .ms-border-dark {
+    border-color: var(--ms-border-dark);
+  }
+
+  /* === FONTS === */
+  .font-title {
+    font-family: "VT323", monospace;
+  }
+  .font-mono {
+    font-family: "IBM Plex Mono", monospace;
+  }
+  .font-digit {
+    font-family: "VT323", monospace;
+    letter-spacing: 0.05em;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-6px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(4px);
+    }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out both;
+  }
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out both;
+  }
+  .animate-shake {
+    animation: shake 0.5s ease-out;
   }
 }
