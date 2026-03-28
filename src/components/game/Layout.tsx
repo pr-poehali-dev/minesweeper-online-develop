@@ -25,7 +25,7 @@ export default function Layout({ children, currentPage, setCurrentPage, theme }:
       <header className="ms-titlebar">
         <div className="flex items-center gap-2">
           <span className="text-2xl">💣</span>
-          <span className="font-title text-xl tracking-widest uppercase">МиноИскатель</span>
+          <span className="font-title text-xl tracking-widest uppercase">Попов Сапёр из гимназии</span>
         </div>
         <div className="flex gap-1">
           <div className="ms-win-btn">─</div>
@@ -52,7 +52,7 @@ export default function Layout({ children, currentPage, setCurrentPage, theme }:
       </main>
 
       <footer className="ms-statusbar">
-        <span>💣 МиноИскатель v1.0</span>
+        <span>💣 Попов Сапёр из гимназии v1.0</span>
         <span className="ml-auto">poehali.dev</span>
       </footer>
     </div>

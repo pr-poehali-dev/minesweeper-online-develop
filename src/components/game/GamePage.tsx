@@ -111,6 +111,8 @@ export default function GamePage({ mode, difficulty, playerName, onGameEnd, setC
   const [flagCount, setFlagCount] = useState(0);
   const [firstClick, setFirstClick] = useState(true);
   const [shaking, setShaking] = useState(false);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [hintCell, setHintCell] = useState<[number, number] | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const reportedRef = useRef(false);
 
@@ -120,6 +122,8 @@ export default function GamePage({ mode, difficulty, playerName, onGameEnd, setC
     setTime(mode === "blitz" ? BLITZ_TIME : 0);
     setFlagCount(0);
     setFirstClick(true);
+    setHintUsed(false);
+    setHintCell(null);
     reportedRef.current = false;
   }, [config.rows, config.cols, mode]);
 
@@ -204,6 +208,28 @@ export default function GamePage({ mode, difficulty, playerName, onGameEnd, setC
     setBoard(newBoard);
   };
 
+  const useHint = () => {
+    if (hintUsed || gameStatus !== "playing" || firstClick) return;
+    const candidates: [number, number][] = [];
+    for (let r = 0; r < config.rows; r++) {
+      for (let c = 0; c < config.cols; c++) {
+        if (!board[r][c].isRevealed && !board[r][c].isMine && !board[r][c].isFlagged) {
+          candidates.push([r, c]);
+        }
+      }
+    }
+    if (candidates.length === 0) return;
+    const [hr, hc] = candidates[Math.floor(Math.random() * candidates.length)];
+    setHintCell([hr, hc]);
+    setHintUsed(true);
+    setTimeout(() => {
+      const revealed = revealCells(board, config.rows, config.cols, hr, hc);
+      setBoard(revealed);
+      setHintCell(null);
+      if (checkWin(revealed)) setGameStatus("won");
+    }, 1200);
+  };
+
   const formatTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
   const minesLeft = config.mines - flagCount;
 
@@ -237,10 +263,20 @@ export default function GamePage({ mode, difficulty, playerName, onGameEnd, setC
               </span>
             </div>
           </div>
-          <button onClick={() => setCurrentPage("home")} className="ms-btn-secondary text-sm flex items-center gap-1">
-            <Icon name="ChevronLeft" size={14} />
-            Меню
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={useHint}
+              disabled={hintUsed || gameStatus !== "playing" || firstClick}
+              title={hintUsed ? "Подсказка уже использована" : "Открыть одну безопасную клетку (1 раз за игру)"}
+              className={`ms-hint-btn ${hintUsed ? "ms-hint-used" : gameStatus === "playing" && !firstClick ? "ms-hint-ready" : "ms-hint-disabled"}`}
+            >
+              💡 {hintUsed ? "Использована" : "Подсказка"}
+            </button>
+            <button onClick={() => setCurrentPage("home")} className="ms-btn-secondary text-sm flex items-center gap-1">
+              <Icon name="ChevronLeft" size={14} />
+              Меню
+            </button>
+          </div>
         </div>
       </div>
 
@@ -288,6 +324,9 @@ export default function GamePage({ mode, difficulty, playerName, onGameEnd, setC
                 content = "🚩";
               } else {
                 cellClass += " ms-cell-hidden";
+                if (hintCell && hintCell[0] === ri && hintCell[1] === ci) {
+                  cellClass += " ms-cell-hint";
+                }
               }
 
               return (
