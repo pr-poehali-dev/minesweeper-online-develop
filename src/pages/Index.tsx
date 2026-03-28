@@ -5,9 +5,10 @@ import RulesPage from "@/components/game/RulesPage";
 import StatsPage from "@/components/game/StatsPage";
 import LeaderboardPage from "@/components/game/LeaderboardPage";
 import SettingsPage from "@/components/game/SettingsPage";
+import PlatformerPage from "@/components/game/PlatformerPage";
 import Layout from "@/components/game/Layout";
 
-export type Page = "home" | "game" | "rules" | "stats" | "leaderboard" | "settings";
+export type Page = "home" | "game" | "rules" | "stats" | "leaderboard" | "settings" | "platformer";
 export type GameMode = "classic" | "blitz" | "infinite";
 export type Difficulty = "easy" | "medium" | "hard";
 
@@ -75,6 +76,9 @@ const Index = () => {
       {currentPage === "leaderboard" && <LeaderboardPage gameHistory={gameHistory} />}
       {currentPage === "settings" && (
         <SettingsPage settings={settings} setSettings={setSettings} />
+      )}
+      {currentPage === "platformer" && (
+        <PlatformerPage setCurrentPage={setCurrentPage} />
       )}
     </Layout>
   );

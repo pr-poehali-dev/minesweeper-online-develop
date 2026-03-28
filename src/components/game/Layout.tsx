@@ -10,7 +10,8 @@ interface LayoutProps {
 
 const navItems: { id: Page; label: string; icon: string }[] = [
   { id: "home", label: "Главная", icon: "House" },
-  { id: "game", label: "Игра", icon: "Gamepad2" },
+  { id: "game", label: "Сапёр", icon: "Gamepad2" },
+  { id: "platformer", label: "Платформер", icon: "Joystick" },
   { id: "leaderboard", label: "Лидеры", icon: "Trophy" },
   { id: "stats", label: "Статистика", icon: "BarChart2" },
   { id: "rules", label: "Правила", icon: "BookOpen" },
